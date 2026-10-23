@@ -1,0 +1,81 @@
+{
+  "name": "PI_Etapa1_Resumen_Operativo",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a1f3c2d4-1111-4a5b-9c0d-000000000001",
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Este nodo crea las tareas del Estudio Rivas para probar el workflow.\n// En la Etapa 4 estos datos de ejemplo se reemplazan por los emails reales de Gmail.\n//\n// return entrega el resultado del nodo al nodo siguiente.\n// Los corchetes [ ] son una lista: cada elemento de la lista es un ítem de n8n.\n// Seis elementos = seis ítems = seis tareas.\nreturn [\n  // Cada ítem va entre llaves { } y separado del siguiente con una coma.\n  {\n    // n8n pide que los datos de cada ítem vayan dentro de json.\n    json: {\n      // Cada línea es clave: valor. La clave es el nombre del dato.\n      // Los números van sin comillas.\n      id: 1,\n      // Los textos van entre comillas dobles.\n      titulo: \"Presentar declaración mensual de Panadería Don Julio\",\n      responsable: \"Tomás\",\n      // Valores posibles: pendiente, en_proceso, completada.\n      estado: \"pendiente\",\n      // Valores posibles: alta, media, baja.\n      prioridad: \"alta\",\n      // Fecha como texto, en formato año-mes-día.\n      // Después del último campo no va coma.\n      fecha_vencimiento: \"2026-11-16\"\n    }\n  },\n  {\n    json: {\n      id: 2,\n      titulo: \"Liquidar sueldos de noviembre de Ferretería Norte\",\n      responsable: \"Tomás\",\n      estado: \"en_proceso\",\n      prioridad: \"alta\",\n      fecha_vencimiento: \"2026-11-30\"\n    }\n  },\n  {\n    json: {\n      id: 3,\n      titulo: \"Confirmar reunión de diagnóstico con Café Molino\",\n      responsable: \"Valeria\",\n      estado: \"pendiente\",\n      prioridad: \"media\",\n      fecha_vencimiento: \"2026-11-12\"\n    }\n  },\n  {\n    json: {\n      id: 4,\n      titulo: \"Archivar comprobantes de octubre\",\n      responsable: \"Tomás\",\n      estado: \"completada\",\n      prioridad: \"baja\",\n      fecha_vencimiento: \"2026-11-10\"\n    }\n  },\n  // La tarea 5 está incompleta a propósito: no tiene título.\n  // En la Clase 2 el workflow tiene que descartarla.\n  {\n    json: {\n      id: 5,\n      titulo: \"\",\n      responsable: \"Carolina\",\n      estado: \"pendiente\",\n      prioridad: \"baja\",\n      fecha_vencimiento: \"2026-11-20\"\n    }\n  },\n  // Después de la última tarea no va coma.\n  {\n    json: {\n      id: 6,\n      titulo: \"Preparar propuesta para Taller Mecánico Ruta 3\",\n      responsable: \"Valeria\",\n      estado: \"en_proceso\",\n      prioridad: \"media\",\n      fecha_vencimiento: \"2026-11-18\"\n    }\n  }\n];"
+      },
+      "id": "a1f3c2d4-2222-4a5b-9c0d-000000000002",
+      "name": "Crear tareas de ejemplo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Disparador\nPone en marcha el workflow cuando haces clic en **Execute workflow**.\n\nEn la Clase 2 se presenta el Schedule Trigger: el mismo resumen, todos los días a las 8:00.",
+        "height": 220,
+        "width": 260,
+        "color": 4
+      },
+      "id": "a1f3c2d4-3333-4a5b-9c0d-000000000003",
+      "name": "Nota 3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Crear tareas de ejemplo\nLas seis tareas del Estudio Rivas en formato JSON.\n\nSale un ítem por tarea. La tarea 5 no tiene título a propósito: en la Clase 2 el workflow la descarta.",
+        "height": 220,
+        "width": 300,
+        "color": 4
+      },
+      "id": "a1f3c2d4-4444-4a5b-9c0d-000000000004",
+      "name": "Nota 4",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -260
+      ]
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Crear tareas de ejemplo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

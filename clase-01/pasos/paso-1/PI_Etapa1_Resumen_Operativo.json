@@ -1,0 +1,24 @@
+{
+  "name": "PI_Etapa1_Resumen_Operativo",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a1f3c2d4-1111-4a5b-9c0d-000000000001",
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    }
+  ],
+  "connections": {},
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}
