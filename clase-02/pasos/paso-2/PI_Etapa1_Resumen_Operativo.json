@@ -1,0 +1,118 @@
+{
+  "name": "PI_Etapa1_Resumen_Operativo",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a1f3c2d4-1111-4a5b-9c0d-000000000001",
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      id: 1,\n      titulo: \"Presentar declaración mensual de Panadería Don Julio\",\n      responsable: \"Tomás\",\n      estado: \"pendiente\",\n      prioridad: \"alta\",\n      fecha_vencimiento: \"2026-11-16\"\n    }\n  },\n  {\n    json: {\n      id: 2,\n      titulo: \"Liquidar sueldos de noviembre de Ferretería Norte\",\n      responsable: \"Tomás\",\n      estado: \"en_proceso\",\n      prioridad: \"alta\",\n      fecha_vencimiento: \"2026-11-30\"\n    }\n  },\n  {\n    json: {\n      id: 3,\n      titulo: \"Confirmar reunión de diagnóstico con Café Molino\",\n      responsable: \"Valeria\",\n      estado: \"pendiente\",\n      prioridad: \"media\",\n      fecha_vencimiento: \"2026-11-12\"\n    }\n  },\n  {\n    json: {\n      id: 4,\n      titulo: \"Archivar comprobantes de octubre\",\n      responsable: \"Tomás\",\n      estado: \"completada\",\n      prioridad: \"baja\",\n      fecha_vencimiento: \"2026-11-10\"\n    }\n  },\n  {\n    json: {\n      id: 5,\n      titulo: \"\",\n      responsable: \"Carolina\",\n      estado: \"pendiente\",\n      prioridad: \"baja\",\n      fecha_vencimiento: \"2026-11-20\"\n    }\n  },\n  {\n    json: {\n      id: 6,\n      titulo: \"Preparar propuesta para Taller Mecánico Ruta 3\",\n      responsable: \"Valeria\",\n      estado: \"en_proceso\",\n      prioridad: \"media\",\n      fecha_vencimiento: \"2026-11-18\"\n    }\n  }\n];"
+      },
+      "id": "a1f3c2d4-2222-4a5b-9c0d-000000000002",
+      "name": "Crear tareas de ejemplo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const tarea = item.json;\n  const errores = [];\n\n  if (!tarea.titulo || tarea.titulo.trim() === \"\") {\n    errores.push(\"Falta el título\");\n  }\n  if (!tarea.responsable || tarea.responsable.trim() === \"\") {\n    errores.push(\"Falta el responsable\");\n  }\n  if (!tarea.estado || tarea.estado.trim() === \"\") {\n    errores.push(\"Falta el estado\");\n  }\n\n  tarea.es_valida = errores.length === 0;\n  tarea.errores = errores;\n  return item;\n});"
+      },
+      "id": "b2f3c2d4-0003-4a5b-9c0d-000000000003",
+      "name": "Validar tareas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.es_valida }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "b2f3c2d4-0004-4a5b-9c0d-000000000004",
+      "name": "Filtrar tareas válidas",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        660,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Crear tareas de ejemplo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear tareas de ejemplo": {
+      "main": [
+        [
+          {
+            "node": "Validar tareas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar tareas": {
+      "main": [
+        [
+          {
+            "node": "Filtrar tareas válidas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

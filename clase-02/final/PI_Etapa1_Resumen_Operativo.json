@@ -1,0 +1,342 @@
+{
+  "name": "PI_Etapa1_Resumen_Operativo",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a1f3c2d4-1111-4a5b-9c0d-000000000001",
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Este nodo crea las tareas del Estudio Rivas para probar el workflow.\n// En la Etapa 4 estos datos de ejemplo se reemplazan por los emails reales de Gmail.\n//\n// return entrega el resultado del nodo al nodo siguiente.\n// Los corchetes [ ] son una lista: cada elemento de la lista es un ítem de n8n.\n// Seis elementos = seis ítems = seis tareas.\nreturn [\n  // Cada ítem va entre llaves { } y separado del siguiente con una coma.\n  {\n    // n8n pide que los datos de cada ítem vayan dentro de json.\n    json: {\n      // Cada línea es clave: valor. La clave es el nombre del dato.\n      // Los números van sin comillas.\n      id: 1,\n      // Los textos van entre comillas dobles.\n      titulo: \"Presentar declaración mensual de Panadería Don Julio\",\n      responsable: \"Tomás\",\n      // Valores posibles: pendiente, en_proceso, completada.\n      estado: \"pendiente\",\n      // Valores posibles: alta, media, baja.\n      prioridad: \"alta\",\n      // Fecha como texto, en formato año-mes-día.\n      // Después del último campo no va coma.\n      fecha_vencimiento: \"2026-11-16\"\n    }\n  },\n  {\n    json: {\n      id: 2,\n      titulo: \"Liquidar sueldos de noviembre de Ferretería Norte\",\n      responsable: \"Tomás\",\n      estado: \"en_proceso\",\n      prioridad: \"alta\",\n      fecha_vencimiento: \"2026-11-30\"\n    }\n  },\n  {\n    json: {\n      id: 3,\n      titulo: \"Confirmar reunión de diagnóstico con Café Molino\",\n      responsable: \"Valeria\",\n      estado: \"pendiente\",\n      prioridad: \"media\",\n      fecha_vencimiento: \"2026-11-12\"\n    }\n  },\n  {\n    json: {\n      id: 4,\n      titulo: \"Archivar comprobantes de octubre\",\n      responsable: \"Tomás\",\n      estado: \"completada\",\n      prioridad: \"baja\",\n      fecha_vencimiento: \"2026-11-10\"\n    }\n  },\n  // La tarea 5 está incompleta a propósito: no tiene título.\n  // En la Clase 2 el workflow tiene que descartarla.\n  {\n    json: {\n      id: 5,\n      titulo: \"\",\n      responsable: \"Carolina\",\n      estado: \"pendiente\",\n      prioridad: \"baja\",\n      fecha_vencimiento: \"2026-11-20\"\n    }\n  },\n  // Después de la última tarea no va coma.\n  {\n    json: {\n      id: 6,\n      titulo: \"Preparar propuesta para Taller Mecánico Ruta 3\",\n      responsable: \"Valeria\",\n      estado: \"en_proceso\",\n      prioridad: \"media\",\n      fecha_vencimiento: \"2026-11-18\"\n    }\n  }\n];"
+      },
+      "id": "a1f3c2d4-2222-4a5b-9c0d-000000000002",
+      "name": "Crear tareas de ejemplo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Revisa cada tarea y le agrega dos datos: es_valida (true o false) y errores (la lista de lo que falta).\n// Este nodo no descarta nada: solo marca. El que descarta es el Filter siguiente.\n//\n// items es la lista de ítems que llega del nodo anterior (las seis tareas).\n// .map recorre la lista y devuelve una lista nueva, del mismo largo, con cada ítem modificado.\nreturn items.map(item => {\n  // tarea es un nombre corto para los datos del ítem (lo que está dentro de json).\n  const tarea = item.json;\n  // Lista vacía: acá se anota cada dato que falta.\n  const errores = [];\n\n  // ! significa \"no hay\". trim() quita los espacios: un título de solo espacios cuenta como vacío.\n  // || significa \"o\": alcanza con que se cumpla una de las dos condiciones.\n  if (!tarea.titulo || tarea.titulo.trim() === \"\") {\n    // push agrega un texto al final de la lista de errores.\n    errores.push(\"Falta el título\");\n  }\n  if (!tarea.responsable || tarea.responsable.trim() === \"\") {\n    errores.push(\"Falta el responsable\");\n  }\n  if (!tarea.estado || tarea.estado.trim() === \"\") {\n    errores.push(\"Falta el estado\");\n  }\n\n  // Si la lista de errores quedó vacía (largo 0), la tarea es válida.\n  tarea.es_valida = errores.length === 0;\n  tarea.errores = errores;\n  // Devuelve el mismo ítem, ahora con los dos datos nuevos.\n  return item;\n});"
+      },
+      "id": "b2f3c2d4-0003-4a5b-9c0d-000000000003",
+      "name": "Validar tareas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.es_valida }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "b2f3c2d4-0004-4a5b-9c0d-000000000004",
+      "name": "Filtrar tareas válidas",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c2",
+              "leftValue": "={{ $json.estado }}",
+              "rightValue": "pendiente",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "c3",
+              "leftValue": "={{ $json.prioridad }}",
+              "rightValue": "alta",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "b2f3c2d4-0005-4a5b-9c0d-000000000005",
+      "name": "Filtrar tareas pendientes o prioritarias",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Junta las tareas que llegan (las que requieren atención) en UN solo ítem: el resumen de la mañana.\n//\n// Saca los datos de cada ítem y arma una lista simple de tareas.\nconst tareas = items.map(item => item.json);\n\nconst resumen = {\n  // La fecha y hora de ahora, en formato estándar (año-mes-díaThora). Va en hora UTC.\n  fecha_generacion: new Date().toISOString(),\n  // .length es la cantidad de elementos de la lista.\n  cantidad_tareas_atencion: tareas.length,\n  // Para cada tarea se copian solo los seis campos de la consigna: es_valida y errores quedan afuera.\n  // Los paréntesis alrededor de las llaves ({ ... }) indican que se devuelve un objeto.\n  tareas: tareas.map(tarea => ({\n    id: tarea.id,\n    titulo: tarea.titulo,\n    responsable: tarea.responsable,\n    estado: tarea.estado,\n    prioridad: tarea.prioridad,\n    fecha_vencimiento: tarea.fecha_vencimiento\n  }))\n};\n\n// Un solo ítem: una lista con un elemento, con los datos dentro de json.\nreturn [{ json: resumen }];"
+      },
+      "id": "b2f3c2d4-0006-4a5b-9c0d-000000000006",
+      "name": "Construir resumen operativo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "m1",
+              "name": "mensaje",
+              "value": "=Buen día, Carolina. Hoy hay {{ $json.cantidad_tareas_atencion }} tareas que requieren atención: {{ $json.tareas.map(t => t.titulo).join(\", \") }}.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "b2f3c2d4-0007-4a5b-9c0d-000000000007",
+      "name": "Mensaje para Carolina",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1320,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Disparador\nArranca con Execute workflow. Con un Schedule Trigger arrancaría solo, todos los días a las 8:00.",
+        "height": 200,
+        "width": 200,
+        "color": 4
+      },
+      "id": "b2f3c2d4-9001-4a5b-9c0d-000000000901",
+      "name": "Nota 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Crear tareas de ejemplo\nLas seis tareas del estudio. La 5 no tiene título a propósito.",
+        "height": 200,
+        "width": 200,
+        "color": 4
+      },
+      "id": "b2f3c2d4-9002-4a5b-9c0d-000000000902",
+      "name": "Nota 2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Validar tareas\nMarca cada tarea con es_valida y errores. No descarta nada.",
+        "height": 200,
+        "width": 200,
+        "color": 4
+      },
+      "id": "b2f3c2d4-9003-4a5b-9c0d-000000000903",
+      "name": "Nota 3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        420,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Filtrar tareas válidas\nDeja pasar solo las tareas con es_valida en true. La 5 queda afuera.",
+        "height": 200,
+        "width": 200,
+        "color": 4
+      },
+      "id": "b2f3c2d4-9004-4a5b-9c0d-000000000904",
+      "name": "Nota 4",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        640,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Filtrar tareas pendientes o prioritarias\nOR: estado pendiente o prioridad alta. Pasan la 1, la 2 y la 3.",
+        "height": 200,
+        "width": 200,
+        "color": 4
+      },
+      "id": "b2f3c2d4-9005-4a5b-9c0d-000000000905",
+      "name": "Nota 5",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        860,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Construir resumen operativo\nJunta las tareas en un solo ítem: fecha, cantidad y listado.",
+        "height": 200,
+        "width": 200,
+        "color": 4
+      },
+      "id": "b2f3c2d4-9006-4a5b-9c0d-000000000906",
+      "name": "Nota 6",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Mensaje para Carolina\nEdit Fields con una expresión: el texto se arma con los datos del resumen.",
+        "height": 200,
+        "width": 200,
+        "color": 4
+      },
+      "id": "b2f3c2d4-9007-4a5b-9c0d-000000000907",
+      "name": "Nota 7",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        -260
+      ]
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Crear tareas de ejemplo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear tareas de ejemplo": {
+      "main": [
+        [
+          {
+            "node": "Validar tareas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar tareas": {
+      "main": [
+        [
+          {
+            "node": "Filtrar tareas válidas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrar tareas válidas": {
+      "main": [
+        [
+          {
+            "node": "Filtrar tareas pendientes o prioritarias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrar tareas pendientes o prioritarias": {
+      "main": [
+        [
+          {
+            "node": "Construir resumen operativo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Construir resumen operativo": {
+      "main": [
+        [
+          {
+            "node": "Mensaje para Carolina",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}
