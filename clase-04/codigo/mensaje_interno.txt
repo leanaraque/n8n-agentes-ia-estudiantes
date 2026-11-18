@@ -1,0 +1,4 @@
+Hola {{ $json.responsable }}: la tarea "{{ $json.titulo }}" necesita seguimiento prioritario.
+Prioridad IA: {{ $json.prioridad_ia }}. Urgencia: {{ $json.urgencia_percibida }}.
+Resumen: {{ $json.idea_principal }}
+Acción recomendada: {{ $json.proximos_pasos }}

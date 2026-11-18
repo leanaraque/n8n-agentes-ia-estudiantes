@@ -1,0 +1,7 @@
+{
+  "sentimiento_general": "negativo",
+  "intensidad": 8,
+  "emocion_primaria": "enojo",
+  "urgencia_percibida": "alta",
+  "requiere_escalacion": true
+}

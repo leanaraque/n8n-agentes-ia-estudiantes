@@ -1,0 +1,1 @@
+{{ $json.id }} · {{ $json.titulo }} · prioridad {{ $json.prioridad_ia }} · {{ $json.sentimiento_general }}

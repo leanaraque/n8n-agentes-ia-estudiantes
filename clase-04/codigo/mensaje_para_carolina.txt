@@ -1,0 +1,7 @@
+Buen día, Carolina. Este es el reporte de hoy.
+Tareas analizadas: {{ $json.count_id }}
+Prioridad alta: {{ $json.sum_es_alta }}
+Con sentimiento negativo: {{ $json.sum_es_negativo }}
+Con seguimiento prioritario: {{ $json.sum_cuenta_seguimiento }}
+
+{{ $json.concatenated_linea }}
