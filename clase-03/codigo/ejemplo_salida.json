@@ -1,0 +1,7 @@
+{
+  "id": 1,
+  "prioridad_ia": "alta",
+  "resumen_ia": "Presentar la declaración mensual de Panadería Don Julio.",
+  "requiere_accion": true,
+  "justificacion": "Venció hace dos días y todavía está pendiente."
+}

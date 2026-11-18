@@ -1,0 +1,287 @@
+{
+  "name": "PI_Etapa2_Agente_Clasificador_Tareas",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a1f3c2d4-1111-4a5b-9c0d-000000000001",
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      id: 1,\n      titulo: \"Presentar declaración mensual de Panadería Don Julio\",\n      responsable: \"Tomás\",\n      estado: \"pendiente\",\n      prioridad: \"alta\",\n      fecha_vencimiento: \"2026-11-16\"\n    }\n  },\n  {\n    json: {\n      id: 2,\n      titulo: \"Liquidar sueldos de noviembre de Ferretería Norte\",\n      responsable: \"Tomás\",\n      estado: \"en_proceso\",\n      prioridad: \"alta\",\n      fecha_vencimiento: \"2026-11-30\"\n    }\n  },\n  {\n    json: {\n      id: 3,\n      titulo: \"Confirmar reunión de diagnóstico con Café Molino\",\n      responsable: \"Valeria\",\n      estado: \"pendiente\",\n      prioridad: \"media\",\n      fecha_vencimiento: \"2026-11-12\"\n    }\n  },\n  {\n    json: {\n      id: 4,\n      titulo: \"Archivar comprobantes de octubre\",\n      responsable: \"Tomás\",\n      estado: \"completada\",\n      prioridad: \"baja\",\n      fecha_vencimiento: \"2026-11-10\"\n    }\n  },\n  {\n    json: {\n      id: 5,\n      titulo: \"\",\n      responsable: \"Carolina\",\n      estado: \"pendiente\",\n      prioridad: \"baja\",\n      fecha_vencimiento: \"2026-11-20\"\n    }\n  },\n  {\n    json: {\n      id: 6,\n      titulo: \"Preparar propuesta para Taller Mecánico Ruta 3\",\n      responsable: \"Valeria\",\n      estado: \"en_proceso\",\n      prioridad: \"media\",\n      fecha_vencimiento: \"2026-11-18\"\n    }\n  }\n];"
+      },
+      "id": "a1f3c2d4-2222-4a5b-9c0d-000000000002",
+      "name": "Crear tareas de ejemplo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const tarea = item.json;\n  const errores = [];\n\n  if (!tarea.titulo || tarea.titulo.trim() === \"\") {\n    errores.push(\"Falta el título\");\n  }\n  if (!tarea.responsable || tarea.responsable.trim() === \"\") {\n    errores.push(\"Falta el responsable\");\n  }\n  if (!tarea.estado || tarea.estado.trim() === \"\") {\n    errores.push(\"Falta el estado\");\n  }\n\n  tarea.es_valida = errores.length === 0;\n  tarea.errores = errores;\n  return item;\n});"
+      },
+      "id": "b2f3c2d4-0003-4a5b-9c0d-000000000003",
+      "name": "Validar tareas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.es_valida }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "b2f3c2d4-0004-4a5b-9c0d-000000000004",
+      "name": "Filtrar tareas válidas",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=## Rol\nEres el asistente de operaciones del Estudio Rivas, una consultora contable y de gestión para pymes.\n\n## Contexto\nRecibes una tarea interna del estudio desde un workflow de n8n. Cada tarea tiene título, responsable, estado, prioridad declarada y fecha de vencimiento. Hoy es {{ $now.toFormat('yyyy-MM-dd') }}.\n\n## Instrucciones\nClasifica la prioridad operativa de la tarea, escribe un resumen de una oración y explica tu decisión.\n- alta: la tarea no está completada y vence hoy, en los próximos 3 días o ya venció.\n- media: la tarea no está completada, vence en más de 3 días e involucra a un cliente.\n- baja: la tarea está completada o es una tarea interna sin impacto en clientes.\nrequiere_accion es true si la tarea no está completada.\n\n## Restricciones\n- Usa solo los datos de la tarea: no inventes clientes, fechas ni montos.\n- prioridad_ia solo puede ser alta, media o baja.\n- Usa el mismo id de la tarea.\n- La justificación tiene una sola oración y nombra el dato que decidió la prioridad.\n\n## Ejemplo\nTarea: {\"id\": 9, \"titulo\": \"Enviar recibos de sueldo de Librería Sur\", \"responsable\": \"Tomás\", \"estado\": \"pendiente\", \"prioridad\": \"media\", \"fecha_vencimiento\": \"2026-11-19\"}\nRespuesta: {\"id\": 9, \"prioridad_ia\": \"alta\", \"resumen_ia\": \"Enviar los recibos de sueldo de Librería Sur.\", \"requiere_accion\": true, \"justificacion\": \"Vence en un día y todavía está pendiente.\"}\n\n## Tarea\n{{ JSON.stringify({ id: $json.id, titulo: $json.titulo, responsable: $json.responsable, estado: $json.estado, prioridad: $json.prioridad, fecha_vencimiento: $json.fecha_vencimiento }) }}",
+        "hasOutputParser": true
+      },
+      "id": "c3f3c2d4-0001-4a5b-9c0d-000000000301",
+      "name": "Clasificar tarea con IA",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        900,
+        0
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "id": "c3f3c2d4-0002-4a5b-9c0d-000000000302",
+      "name": "Groq Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        860,
+        220
+      ],
+      "credentials": {
+        "groqApi": {
+          "id": "",
+          "name": "Groq"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"id\": 1,\n  \"prioridad_ia\": \"alta\",\n  \"resumen_ia\": \"Presentar la declaración mensual de Panadería Don Julio.\",\n  \"requiere_accion\": true,\n  \"justificacion\": \"Venció hace dos días y todavía está pendiente.\"\n}"
+      },
+      "id": "c3f3c2d4-0003-4a5b-9c0d-000000000303",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1040,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const prioridadesValidas = [\"alta\", \"media\", \"baja\"];\n\nreturn items.map(item => {\n  const tarea = item.json.output || {};\n  const errores = [];\n\n  if (!tarea.id) {\n    errores.push(\"Falta id\");\n  }\n  if (!tarea.prioridad_ia || !prioridadesValidas.includes(tarea.prioridad_ia.toLowerCase())) {\n    errores.push(\"Prioridad IA inválida\");\n  }\n  if (!tarea.resumen_ia) {\n    errores.push(\"Falta resumen IA\");\n  }\n  if (typeof tarea.requiere_accion !== \"boolean\") {\n    errores.push(\"El campo requiere_accion debe ser booleano\");\n  }\n\n  return {\n    json: {\n      ...tarea,\n      prioridad_ia: tarea.prioridad_ia ? tarea.prioridad_ia.toLowerCase() : null,\n      salida_ia_valida: errores.length === 0,\n      errores_salida_ia: errores\n    }\n  };\n});"
+      },
+      "id": "c3f3c2d4-0004-4a5b-9c0d-000000000304",
+      "name": "Validar salida IA",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const tareas = items\n  .map(item => item.json)\n  .filter(tarea => tarea.salida_ia_valida);\n\nconst prioridadAlta = tareas.filter(tarea => tarea.prioridad_ia === \"alta\");\n\nconst resumen = {\n  fecha_generacion: new Date().toISOString(),\n  cantidad_tareas_analizadas: tareas.length,\n  cantidad_prioridad_alta: prioridadAlta.length,\n  tareas: tareas.map(tarea => ({\n    id: tarea.id,\n    prioridad_ia: tarea.prioridad_ia,\n    resumen_ia: tarea.resumen_ia,\n    requiere_accion: tarea.requiere_accion,\n    justificacion: tarea.justificacion\n  }))\n};\n\nreturn [{ json: resumen }];"
+      },
+      "id": "c3f3c2d4-0005-4a5b-9c0d-000000000305",
+      "name": "Construir resumen enriquecido",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "m1",
+              "name": "mensaje",
+              "value": "=Buen día, Carolina. La IA analizó {{ $json.cantidad_tareas_analizadas }} tareas y {{ $json.cantidad_prioridad_alta }} son de prioridad alta: {{ $json.tareas.filter(t => t.prioridad_ia === \"alta\").map(t => t.resumen_ia).join(\" \") }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "b2f3c2d4-0007-4a5b-9c0d-000000000007",
+      "name": "Mensaje para Carolina",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1660,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Crear tareas de ejemplo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear tareas de ejemplo": {
+      "main": [
+        [
+          {
+            "node": "Validar tareas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar tareas": {
+      "main": [
+        [
+          {
+            "node": "Filtrar tareas válidas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrar tareas válidas": {
+      "main": [
+        [
+          {
+            "node": "Clasificar tarea con IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clasificar tarea con IA": {
+      "main": [
+        [
+          {
+            "node": "Validar salida IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar salida IA": {
+      "main": [
+        [
+          {
+            "node": "Construir resumen enriquecido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Construir resumen enriquecido": {
+      "main": [
+        [
+          {
+            "node": "Mensaje para Carolina",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Clasificar tarea con IA",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Clasificar tarea con IA",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

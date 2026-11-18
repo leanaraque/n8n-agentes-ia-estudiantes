@@ -1,0 +1,1 @@
+Buen día, Carolina. La IA analizó {{ $json.cantidad_tareas_analizadas }} tareas y {{ $json.cantidad_prioridad_alta }} son de prioridad alta: {{ $json.tareas.filter(t => t.prioridad_ia === "alta").map(t => t.resumen_ia).join(" ") }}
